@@ -4,7 +4,7 @@ from django.db import models
 class Task(models.Model):
     
     descricao = models.CharField( max_length=50,  null=False)
-    completo = models.CharField(max_length=50, null=False)
+    completo = models.BooleanField(default=False, null=False)
     
     
     class Meta:
