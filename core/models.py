@@ -3,6 +3,7 @@ from django.db import models
 
 class Task(models.Model):
     
+    _id = models.AutoField(primary_key=True)
     descricao = models.CharField( max_length=50,  null=False)
     completo = models.BooleanField(default=False, null=False)
     
