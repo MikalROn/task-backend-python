@@ -11,6 +11,8 @@ class TaskTest(APITestCase):
         self.task1 = Task.objects.create(descricao="test1", completo=False)
         self.task2 = Task.objects.create(descricao="test2", completo=False)
         
+        self.task_concluido = Task.objects.create(descricao="test")
+        
         self.uri = '/api/task/'
     
     def test_task_create(self):
@@ -43,15 +45,13 @@ class TaskTest(APITestCase):
     
     
     def test_task_delete(self):
-        data = {
-            "descricao": "test"
-        }
         
-        r = self.client.put(f'{self.uri}{self.task.pk}/', data)
+        r = self.client.delete(f'{self.uri}{self.task.pk}/')
 
-        print(r.status_code, r.content, r.context)
-        
-        self.assertEqual(r.status_code, status.HTTP_200_OK)
+        self.assertEqual(r.status_code, status.HTTP_204_NO_CONTENT)
+
+        with self.assertRaises(Task.DoesNotExist):
+            Task.objects.get(pk=self.task.pk)
     
     
     def test_task_get(self):
@@ -62,3 +62,23 @@ class TaskTest(APITestCase):
         r = self.client.put(f'{self.uri}{self.task.pk}/', data)
         
         self.assertEqual(r.status_code, status.HTTP_200_OK)
+        
+    def test_task_concluir_task(self):
+        r = self.client.get(f'{self.uri}{self.task_concluido.pk}/completar-task/')
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+        
+        self.task_concluido.refresh_from_db()
+        self.assertTrue(self.task_concluido.completo)
+
+    def test_task_cancelar_conclusao_task(self):
+        
+        
+        
+        self.task_concluido.completo = True
+        self.task_concluido.save()
+
+        r = self.client.get(f'{self.uri}{self.task_concluido.pk}/cancelar-conclusao-task/')
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+
+        self.task_concluido.refresh_from_db()
+        self.assertFalse(self.task_concluido.completo)

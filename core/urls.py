@@ -10,5 +10,5 @@ router.register(r'task', views.TaskListViewSet)
 
 
 urlpatterns = [
-    path('', include(router.urls))
+    path('', include(router.urls)),
 ]
